@@ -3,6 +3,7 @@ import Summary from './components/Summary'
 import TransactionForm from './components/TransactionForm'
 import TransactionList from './components/TransactionList'
 import ExpenseChart from './components/ExpenseChart'
+import ReceiptScanner from './components/ReceiptScanner'
 import { CATEGORIES } from './constants'
 import './App.css'
 
@@ -18,6 +19,7 @@ const DEFAULT_TRANSACTIONS = [
 ];
 
 function App() {
+  const [activeTab, setActiveTab] = useState("manual");
   const [transactions, setTransactions] = useState(() => {
     const saved = localStorage.getItem("transactions");
     if (saved) {
@@ -106,10 +108,40 @@ function App() {
       <div className="dashboard-grid">
         {/* Left column: input form & statistics breakdown */}
         <div className="left-panel-group">
-          <TransactionForm 
-            onAddTransaction={handleAddTransaction} 
-            onShowToast={showToast} 
-          />
+          <div className="entry-tabs" role="tablist" aria-label="Transaction Input Options">
+            <button 
+              className={`tab-btn ${activeTab === 'manual' ? 'active' : ''}`}
+              onClick={() => setActiveTab('manual')}
+              role="tab"
+              aria-selected={activeTab === 'manual'}
+              id="tab-manual"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+              Manual Entry
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'ocr' ? 'active' : ''}`}
+              onClick={() => setActiveTab('ocr')}
+              role="tab"
+              aria-selected={activeTab === 'ocr'}
+              id="tab-ocr"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+              AI OCR Scanner
+            </button>
+          </div>
+
+          {activeTab === 'manual' ? (
+            <TransactionForm 
+              onAddTransaction={handleAddTransaction} 
+              onShowToast={showToast} 
+            />
+          ) : (
+            <ReceiptScanner 
+              onAddTransaction={handleAddTransaction} 
+              onShowToast={showToast} 
+            />
+          )}
 
           {/* Pure CSS Breakdown statistics */}
           {totalExpenses > 0 && (
